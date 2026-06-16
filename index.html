@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Invitation Preview</title>
+    <style>
+        /* --- CSS VARIABLES FOR THE NEON TAVERN THEME --- */
+        :root {
+            --neon-glow: #8b5cf6;
+            --neon-secondary: #ec4899;
+            --bg-dark: #090514;
+            --parchment: #fcf6e8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #090514;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- SMOOTH ANIMATED NEON BACKGROUND --- */
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, #1e0b36 0%, #07020d 50%, #2e0821 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 12s ease infinite;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Neon Ambient Floating Particles */
+        .ambient-glow {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            z-index: 2;
+            filter: blur(20px);
+            animation: floatGlow 8s ease-in-out infinite alternate;
+        }
+
+        .glow-1 {
+            top: 15%;
+            left: 10%;
+        }
+
+        .glow-2 {
+            bottom: 15%;
+            right: 10%;
+            animation-delay: -4s;
+        }
+
+        @keyframes floatGlow {
+            0% {
+                transform: translateY(0px) scale(1);
+            }
+
+            100% {
+                transform: translateY(-30px) scale(1.2);
+            }
+        }
+
+        /* --- VIEWPORT CONTAINER --- */
+        .app-viewport {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 420px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* --- INTRO CARDS STYLING --- */
+        .intro-cards-container {
+            position: absolute;
+            z-index: 30; /* Sit on top of everything initially */
+            width: 100%;
+            max-width: 360px;
+            height: 220px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .intro-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--parchment);
+            border-radius: 24px;
+            padding: 24px;
+            border: 3px solid #fffdf9;
+            outline: 2px solid var(--neon-secondary);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(236, 72, 153, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0.9) translateY(10px);
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .intro-card.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        .intro-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e1b4b;
+            line-height: 1.5;
+        }
+
+        .intro-tap-hint {
+            position: absolute;
+            bottom: 15px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #ec4899;
+            animation: pulseHint 1.5s infinite alternate;
+        }
+
+        @keyframes pulseHint {
+            0% {
+                opacity: 0.5;
+                transform: scale(0.95);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        /* --- ENVELOPE WRAPPER --- */
+        .envelope-wrapper {
+            position: relative;
+            width: 280px;
+            height: 190px;
+            z-index: 15;
+            perspective: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.85);
+            pointer-events: none;
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .envelope-wrapper.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        /* --- ENVELOPE CONTAINER --- */
+        .envelope-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            cursor: pointer;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease;
+            transform-style: preserve-3d;
+        }
+
+        .envelope-wrapper.open .envelope-container {
+            transform: translateY(100vh);
+            opacity: 0;
+            pointer-events: none;
+            transition-delay: 0.6s;
+        }
+
+        /* Envelope Back */
+        .envelope-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f4eae1;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(139, 92, 246, 0.3);
+            z-index: 1;
+        }
+
+        /* Envelope Flap */
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 105px solid #e2d2c3;
+            transform-origin: top;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 4;
+        }
+
+        .envelope-wrapper.open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        /* Envelope Pocket */
+        .envelope-pocket {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            overflow: hidden;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .envelope-pocket::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid #ecdccf;
+            border-right: 140px solid #ecdccf;
+            border-top: 95px solid transparent;
+        }
+
+        /* Wax Seal */
+        .wax-seal {
+            position: absolute;
+            top: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            border-radius: 50%;
+            z-index: 5;
+            box-shadow: 0 0 15px #a78bfa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 16px;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .envelope-wrapper.open .wax-seal {
+            transform: translateX(-50%) translateY(50px) scale(0);
+            opacity: 0;
+        }
+
+        /* --- THE INVITATION CARD --- */
+        .main-card {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -47%) scale(0.9);
+            width: 260px;
+            max-height: 170px;
+            opacity: 0;
+            z-index: 2;
+            background: var(--parchment);
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(139, 92, 246, 0.2);
+            border: 4px solid #fffdf9;
+            outline: 2px solid var(--neon-glow);
+            text-align: center;
+            overflow: hidden;
+            transition:
+                transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                max-height 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.8s ease;
+        }
+
+        .envelope-wrapper.open .main-card {
+            opacity: 1;
+            width: calc(100vw - 40px);
+            max-width: 380px;
+            max-height: 600px;
+            transform: translate(-50%, -50%) scale(1);
+            z-index: 20;
+            overflow: visible;
+            transition-delay: 0.3s;
+        }
+
+        /* Fortress Dining Graphic Frame */
+        .card-banner {
+            width: 100%;
+            height: 190px;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .fortress-dining-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .banner-overlay-text {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            background: rgba(139, 92, 246, 0.85);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
+        }
+
+        /* --- TYPOGRAPHY --- */
+        .invite-title {
+            font-size: 21px;
+            font-weight: 800;
+            color: #1e1b4b;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .invite-subtitle {
+            font-size: 15px;
+            color: #5b21b6;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        /* --- BUTTON MATRIX --- */
+        .button-arena {
+            position: relative;
+            width: 100%;
+            height: 55px;
+            margin-top: 15px;
+        }
+
+        .choice-btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            position: absolute;
+        }
+
+        .yes-btn {
+            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+            left: 15px;
+            width: 120px;
+        }
+
+        .yes-btn:active {
+            transform: scale(0.95);
+        }
+
+        .no-btn {
+            background-color: #e5e7eb;
+            color: #4b5563;
+            right: 15px;
+            width: 120px;
+            touch-action: none;
+            /* Prevents default viewport gestures when moving */
+            z-index: 50;
+        }
+
+        /* --- SUCCESS TAB --- */
+        .success-view {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 10px;
+        }
+
+        .success-view h2 {
+            color: #7c3aed;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .success-view p {
+            color: #4b5563;
+            font-size: 15px;
+        }
+
+        /* --- SIGNATURE ELEMENT --- */
+        .footer-sign {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 28px;
+            z-index: 10;
+            filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.6));
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- BACKGROUND EFFECTS -->
+    <div class="animated-bg"></div>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <!-- BACKGROUND AUDIO SYSTEM -->
+    <audio id="bgSong" autoplay loop>
+        <source src="dj-el-baron_indila-love-story.mp3?v=1" type="audio/mpeg">
+    </audio>
+
+    <div class="app-viewport">
+
+        <!-- INTRO CARDS LAYER -->
+        <div class="intro-cards-container" id="introContainer">
+            <div class="intro-card active" onclick="nextIntroCard(1)">
+                <p class="intro-text">I know that you spent a very hard week.</p>
+                <div class="intro-tap-hint">Tap to continue </div>
+            </div>
+            <div class="intro-card" onclick="nextIntroCard(2)">
+                <p class="intro-text">I tried to think to come up with a place that would lower your stress and pressure.</p>
+                <div class="intro-tap-hint">Tap to continue </div>
+            </div>
+            <div class="intro-card" onclick="nextIntroCard(3)">
+                <p class="intro-text">So I thought the best place would be a place where you could eat, play and have fun and that's how I came up with...</p>
+                <div class="intro-tap-hint">Tap to unlock 🔓</div>
+            </div>
+        </div>
+
+        <!-- ENVELOPE WRAPPER (Handles the animation states and layout) -->
+        <div class="envelope-wrapper" id="envelopeWrapper">
+
+            <!-- MAIN RESPONSIVE INVITATION CARD -->
+            <div class="main-card" id="cardElement">
+                <div id="interactiveContent">
+                    <!-- Tavern Dining Themed Header -->
+                    <div class="card-banner">
+                        <img src="fortress-melbourne-cbd.jpg?v=1" alt="Tavern Dining Area" class="fortress-dining-img">
+                        <div class="banner-overlay-text">🏰 Tavern Dining Area</div>
+                    </div>
+
+                    <h1 class="invite-title">Shekiba, you are invited to<br>Fortress by Shayan.</h1>
+
+                    <div class="button-arena" id="arenaBox">
+                        <button class="choice-btn yes-btn" onclick="confirmYes()">Yes</button>
+                        <button class="choice-btn no-btn" id="evasiveNoBtn">No</button>
+                    </div>
+                </div>
+
+                <!-- SUCCESS LAYOUT -->
+                <div class="success-view" id="successContent">
+                    <h2>Let's goooo. Just lemme know the best time suits you!</h2>
+                    <div style="font-size: 45px; margin-top: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));">
+                        🎮✨🍹</div>
+                </div>
+            </div>
+
+            <!-- ENVELOPE PARTS CONTAINER -->
+            <div class="envelope-container" id="envelopeElement" onclick="unwrapInvitation()">
+                <div class="envelope-back"></div>
+                <div class="envelope-pocket"></div>
+                <div class="envelope-flap"></div>
+                <div class="wax-seal">🦋</div>
+            </div>
+
+        </div>
+
+        <!-- STABLE SIGNATURE PIECE -->
+        <div class="footer-sign">🦋</div>
+    </div>
+
+    <script>
+        const wrapper = document.getElementById('envelopeWrapper');
+        const card = document.getElementById('cardElement');
+        const noBtn = document.getElementById('evasiveNoBtn');
+        const arena = document.getElementById('arenaBox');
+        const audioTrack = document.getElementById('bgSong');
+        
+        // Set background music volume to half (50%)
+        audioTrack.volume = 0.5;
+
+        // Try playing immediately
+        audioTrack.play().catch(err => {
+            console.log("Autoplay prevented by browser, waiting for user interaction.");
+        });
+
+        // Play on first user interaction as a fallback
+        const startAudioOnInteraction = () => {
+            audioTrack.play().catch(err => console.log(err));
+            window.removeEventListener('click', startAudioOnInteraction);
+            window.removeEventListener('touchstart', startAudioOnInteraction);
+        };
+        window.addEventListener('click', startAudioOnInteraction);
+        window.addEventListener('touchstart', startAudioOnInteraction, { passive: true });
+
+        let currentIntroStep = 1;
+
+        function nextIntroCard(step) {
+            // Force play audio on user tap
+            audioTrack.play().catch(err => console.log(err));
+
+            const currentCard = document.querySelector(`.intro-card:nth-child(${step})`);
+            
+            // Fade out the current card
+            currentCard.classList.remove('active');
+            
+            if (step < 3) {
+                // Show next card after a brief delay
+                setTimeout(() => {
+                    const nextCard = document.querySelector(`.intro-card:nth-child(${step + 1})`);
+                    nextCard.classList.add('active');
+                }, 400);
+            } else {
+                // All intro cards finished! Show the envelope.
+                const introContainer = document.getElementById('introContainer');
+                introContainer.style.opacity = '0';
+                introContainer.style.transform = 'scale(0.9) translateY(-20px)';
+                
+                setTimeout(() => {
+                    introContainer.style.display = 'none';
+                    wrapper.classList.add('show');
+                }, 500);
+            }
+        }
+
+        function unwrapInvitation() {
+            // Add open class to envelope wrapper to trigger CSS transitions
+            wrapper.classList.add('open');
+
+            // Audio safely plays upon direct human interface click
+            audioTrack.play().catch(err => {
+                console.log("Audio waiting for explicit override rule context:", err);
+            });
+        }
+
+        // Combined Touch and pointer interactions for mobile tap execution
+        function dodgeButton(e) {
+            e.preventDefault(); // Kill standard click triggers
+
+            const arenaWidth = arena.clientWidth;
+            const arenaHeight = arena.clientHeight;
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+
+            // Generate safe relative layout coordinate targets inside the card boundary 
+            const maxAllowedX = arenaWidth - btnWidth;
+            // Let the button escape vertically across the card canvas
+            const randomX = Math.floor(Math.random() * maxAllowedX);
+            const randomY = Math.floor((Math.random() * 180) - 120);
+
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        }
+
+        // Event hooks ensuring zero loophole trigger maps on touch screens
+        noBtn.addEventListener('touchstart', dodgeButton, { passive: false });
+        noBtn.addEventListener('pointerdown', dodgeButton);
+        noBtn.addEventListener('mouseover', dodgeButton);
+
+        function confirmYes() {
+            document.getElementById('interactiveContent').style.display = 'none';
+            document.getElementById('successContent').style.display = 'flex';
+        }
+    </script>
+</body>
+
+</html>
