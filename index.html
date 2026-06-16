@@ -112,8 +112,8 @@
             position: absolute;
             z-index: 30; /* Sit on top of everything initially */
             width: 100%;
-            max-width: 360px;
-            height: 220px;
+            max-width: 380px;
+            height: 260px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -149,7 +149,7 @@
         }
 
         .intro-text {
-            font-size: 18px;
+            font-size: 22px;
             font-weight: 700;
             color: #1e1b4b;
             line-height: 1.5;
@@ -158,7 +158,7 @@
         .intro-tap-hint {
             position: absolute;
             bottom: 15px;
-            font-size: 11px;
+            font-size: 13px;
             font-weight: bold;
             color: #ec4899;
             animation: pulseHint 1.5s infinite alternate;
@@ -179,8 +179,8 @@
         /* --- ENVELOPE WRAPPER --- */
         .envelope-wrapper {
             position: relative;
-            width: 280px;
-            height: 190px;
+            width: 320px;
+            height: 220px;
             z-index: 15;
             perspective: 1000px;
             display: flex;
@@ -238,9 +238,9 @@
             left: 0;
             width: 0;
             height: 0;
-            border-left: 140px solid transparent;
-            border-right: 140px solid transparent;
-            border-top: 105px solid #e2d2c3;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 120px solid #e2d2c3;
             transform-origin: top;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 4;
@@ -268,15 +268,15 @@
             left: 0;
             width: 0;
             height: 0;
-            border-left: 140px solid #ecdccf;
-            border-right: 140px solid #ecdccf;
-            border-top: 95px solid transparent;
+            border-left: 160px solid #ecdccf;
+            border-right: 160px solid #ecdccf;
+            border-top: 110px solid transparent;
         }
 
         /* Wax Seal */
         .wax-seal {
             position: absolute;
-            top: 85px;
+            top: 100px;
             left: 50%;
             transform: translateX(-50%);
             width: 44px;
@@ -304,8 +304,8 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -47%) scale(0.9);
-            width: 260px;
-            max-height: 170px;
+            width: 300px;
+            max-height: 200px;
             opacity: 0;
             z-index: 2;
             background: var(--parchment);
@@ -325,8 +325,8 @@
 
         .envelope-wrapper.open .main-card {
             opacity: 1;
-            width: calc(100vw - 40px);
-            max-width: 380px;
+            width: calc(100vw - 32px);
+            max-width: 400px;
             max-height: 600px;
             transform: translate(-50%, -50%) scale(1);
             z-index: 20;
@@ -337,7 +337,7 @@
         /* Fortress Dining Graphic Frame */
         .card-banner {
             width: 100%;
-            height: 190px;
+            height: 210px;
             border-radius: 16px;
             overflow: hidden;
             position: relative;
@@ -359,7 +359,7 @@
             background: rgba(139, 92, 246, 0.85);
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 13px;
             font-weight: bold;
             color: white;
             box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
@@ -367,7 +367,7 @@
 
         /* --- TYPOGRAPHY --- */
         .invite-title {
-            font-size: 21px;
+            font-size: 24px;
             font-weight: 800;
             color: #1e1b4b;
             line-height: 1.3;
@@ -375,7 +375,7 @@
         }
 
         .invite-subtitle {
-            font-size: 15px;
+            font-size: 17px;
             color: #5b21b6;
             font-weight: 500;
             margin-bottom: 24px;
@@ -385,15 +385,15 @@
         .button-arena {
             position: relative;
             width: 100%;
-            height: 55px;
+            height: 60px;
             margin-top: 15px;
         }
 
         .choice-btn {
-            padding: 12px 32px;
+            padding: 14px 36px;
             border: none;
             border-radius: 50px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
             cursor: pointer;
             transition: transform 0.1s ease;
@@ -405,7 +405,7 @@
             color: white;
             box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
             left: 15px;
-            width: 120px;
+            width: 130px;
         }
 
         .yes-btn:active {
@@ -416,7 +416,7 @@
             background-color: #e5e7eb;
             color: #4b5563;
             right: 15px;
-            width: 120px;
+            width: 130px;
             touch-action: none;
             /* Prevents default viewport gestures when moving */
             z-index: 50;
@@ -433,14 +433,14 @@
 
         .success-view h2 {
             color: #7c3aed;
-            font-size: 26px;
+            font-size: 30px;
             font-weight: 800;
             margin-bottom: 8px;
         }
 
         .success-view p {
             color: #4b5563;
-            font-size: 15px;
+            font-size: 17px;
         }
 
         /* --- SIGNATURE ELEMENT --- */
@@ -449,7 +449,7 @@
             bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 28px;
+            font-size: 34px;
             z-index: 10;
             filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.6));
         }
